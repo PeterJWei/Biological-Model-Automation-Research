@@ -1,7 +1,10 @@
 ////////////////////////////////////////////////////
 test number 0, molecule ERK, 3 inputs
 ////////////////////////////////////////////////////
-ERK_0:
+ERK_0 = ERK_0_final
+ERK_1 = ERK_1_final
+ERK_2 = ERK_2_final
+ERK_0_tmp = 
 (ERK_ACT_0  and  DUSP_MKP_0  and  ERK_CURRENT_0) or
 (ERK_ACT_0  and  DUSP_MKP_1  and  ERK_CURRENT_0) or
 (ERK_ACT_1  and  DUSP_MKP_1  and  ERK_CURRENT_0) or
@@ -14,7 +17,7 @@ ERK_0:
 (ERK_ACT_0  and  DUSP_MKP_2  and  ERK_CURRENT_1) or
 (ERK_ACT_1  and  DUSP_MKP_2  and  ERK_CURRENT_1) or
 (ERK_ACT_2  and  ERK_ACT_2_del1  and  DUSP_MKP_1  and  DUSP_MKP_0_del1  and  ERK_CURRENT_0)
-ERK_1:
+ERK_1_tmp = 
 (ERK_ACT_1  and  DUSP_MKP_0  and  ERK_CURRENT_0) or
 (ERK_ACT_2  and  DUSP_MKP_0  and  ERK_CURRENT_0) or
 (ERK_ACT_2  and  ERK_ACT_1_del1  and  ERK_ACT_0_del2  and  DUSP_MKP_0  and  DUSP_MKP_0_del1  and  DUSP_MKP_0_del2  and  ERK_CURRENT_0) or
@@ -25,7 +28,7 @@ ERK_1:
 (ERK_ACT_0  and  DUSP_MKP_2  and  ERK_CURRENT_2) or
 (ERK_ACT_1  and  DUSP_MKP_2  and  ERK_CURRENT_2) or
 (ERK_ACT_2  and  ERK_ACT_2_del1  and  DUSP_MKP_2  and  DUSP_MKP_0_del1  and  ERK_CURRENT_0)
-ERK_2:
+ERK_2_tmp = 
 (ERK_ACT_1  and  DUSP_MKP_0  and  ERK_CURRENT_1) or
 (ERK_ACT_2  and  DUSP_MKP_0  and  ERK_CURRENT_1) or
 (ERK_ACT_0  and  DUSP_MKP_0  and  ERK_CURRENT_2) or
@@ -40,23 +43,35 @@ ERK_1_del3 = ERK_1_del2
 ERK_2_del1 = ERK_2
 ERK_2_del2 = ERK_2_del1
 ERK_2_del3 = ERK_2_del2
+ERK_0_final =
+(~ERK_0_tmp & ~ERK_1_tmp & ~ERK_2_tmp & ERK) & ERK_0_tmp
+
+ERK_1_final =
+(~ERK_0_tmp & ~ERK_1_tmp & ~ERK_2_tmp & ERK) & ERK_1_tmp
+
+ERK_2_final =
+(~ERK_0_tmp & ~ERK_1_tmp & ~ERK_2_tmp & ERK) & ERK_2_tmp
+
 ////////////////////////////////////////////////////
 test number 1, molecule ERK_ACT, 4 inputs
 ////////////////////////////////////////////////////
-ERK_ACT_0:
+ERK_ACT_0 = ERK_ACT_0_final
+ERK_ACT_1 = ERK_ACT_1_final
+ERK_ACT_2 = ERK_ACT_2_final
+ERK_ACT_0_tmp = 
 (TGFBRA_0  and  TRA_0  and  MEK_0  and  IGF1RA_0) or
 (TGFBRA_0  and  TRA_0  and  MEK_0  and  IGF1RA_1) or
 (TGFBRA_1  and  TRA_0  and  MEK_0  and  IGF1RA_1) or
 (TGFBRA_0  and  TRA_1  and  MEK_0  and  IGF1RA_1) or
 (TGFBRA_0  and  TRA_0  and  MEK_1  and  IGF1RA_1)
-ERK_ACT_1:
+ERK_ACT_1_tmp = 
 (TGFBRA_1  and  TRA_0  and  MEK_0  and  IGF1RA_0) or
 (TGFBRA_0  and  TRA_1  and  MEK_0  and  IGF1RA_0) or
 (TGFBRA_0  and  TRA_0  and  MEK_1  and  IGF1RA_0) or
 (TGFBRA_1  and  TRA_1  and  MEK_0  and  IGF1RA_1) or
 (TGFBRA_1  and  TRA_0  and  MEK_1  and  IGF1RA_1) or
 (TGFBRA_0  and  TRA_1  and  MEK_1  and  IGF1RA_1)
-ERK_ACT_2:
+ERK_ACT_2_tmp = 
 (TGFBRA_1  and  TRA_1  and  MEK_0  and  IGF1RA_0) or
 (TGFBRA_1  and  TRA_0  and  MEK_1  and  IGF1RA_0) or
 (TGFBRA_0  and  TRA_1  and  MEK_1  and  IGF1RA_0) or
@@ -71,12 +86,24 @@ ERK_ACT_1_del3 = ERK_ACT_1_del2
 ERK_ACT_2_del1 = ERK_ACT_2
 ERK_ACT_2_del2 = ERK_ACT_2_del1
 ERK_ACT_2_del3 = ERK_ACT_2_del2
+ERK_ACT_0_final =
+(~ERK_ACT_0_tmp & ~ERK_ACT_1_tmp & ~ERK_ACT_2_tmp & ERK_ACT) & ERK_ACT_0_tmp
+
+ERK_ACT_1_final =
+(~ERK_ACT_0_tmp & ~ERK_ACT_1_tmp & ~ERK_ACT_2_tmp & ERK_ACT) & ERK_ACT_1_tmp
+
+ERK_ACT_2_final =
+(~ERK_ACT_0_tmp & ~ERK_ACT_1_tmp & ~ERK_ACT_2_tmp & ERK_ACT) & ERK_ACT_2_tmp
+
 ////////////////////////////////////////////////////
 test number 2, molecule P38_MAPK_ACT, 5 inputs
 ////////////////////////////////////////////////////
-P38_MAPK_ACT_0:
+P38_MAPK_ACT_0 = P38_MAPK_ACT_0_final
+P38_MAPK_ACT_1 = P38_MAPK_ACT_1_final
+P38_MAPK_ACT_2 = P38_MAPK_ACT_2_final
+P38_MAPK_ACT_0_tmp = 
 (IRA_0  and  MKK36_0  and  TRA_0  and  ASNOS_C_0  and  ROS_0)
-P38_MAPK_ACT_1:
+P38_MAPK_ACT_1_tmp = 
 (IRA_1  and  MKK36_0  and  TRA_0  and  ASNOS_C_0  and  ROS_0) or
 (IRA_0  and  MKK36_1  and  TRA_0  and  ASNOS_C_0  and  ROS_0) or
 (IRA_1  and  MKK36_1  and  TRA_0  and  ASNOS_C_0  and  ROS_0) or
@@ -94,7 +121,7 @@ P38_MAPK_ACT_1:
 (IRA_1  and  MKK36_0  and  TRA_1  and  ASNOS_C_0  and  ROS_1) or
 (IRA_1  and  MKK36_0  and  TRA_0  and  ASNOS_C_1  and  ROS_1) or
 (IRA_1  and  MKK36_0  and  TRA_0  and  ASNOS_C_0  and  ROS_2)
-P38_MAPK_ACT_2:
+P38_MAPK_ACT_2_tmp = 
 (IRA_1  and  MKK36_1  and  TRA_1  and  ASNOS_C_0  and  ROS_0) or
 (IRA_1  and  MKK36_1  and  TRA_0  and  ASNOS_C_1  and  ROS_0) or
 (IRA_1  and  MKK36_0  and  TRA_1  and  ASNOS_C_1  and  ROS_0) or
@@ -158,3 +185,12 @@ P38_MAPK_ACT_1_del3 = P38_MAPK_ACT_1_del2
 P38_MAPK_ACT_2_del1 = P38_MAPK_ACT_2
 P38_MAPK_ACT_2_del2 = P38_MAPK_ACT_2_del1
 P38_MAPK_ACT_2_del3 = P38_MAPK_ACT_2_del2
+P38_MAPK_ACT_0_final =
+(~P38_MAPK_ACT_0_tmp & ~P38_MAPK_ACT_1_tmp & ~P38_MAPK_ACT_2_tmp & P38_MAPK_ACT) & P38_MAPK_ACT_0_tmp
+
+P38_MAPK_ACT_1_final =
+(~P38_MAPK_ACT_0_tmp & ~P38_MAPK_ACT_1_tmp & ~P38_MAPK_ACT_2_tmp & P38_MAPK_ACT) & P38_MAPK_ACT_1_tmp
+
+P38_MAPK_ACT_2_final =
+(~P38_MAPK_ACT_0_tmp & ~P38_MAPK_ACT_1_tmp & ~P38_MAPK_ACT_2_tmp & P38_MAPK_ACT) & P38_MAPK_ACT_2_tmp
+

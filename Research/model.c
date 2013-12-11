@@ -2,10 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "test_cases.h"
+#include "parsing.c"
+
 /*struct stren {
     int strength;
     int delay;
 };*/
+int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *poss, int molNums, int systemMax);
 int maxDelay(int* arrB, int arrSize);
 void printRules(char ***rules, int num, char* str, int systemMax);
 
@@ -13,8 +16,14 @@ int n = 5;
 
 int main() {
     int i;
+    struct table* test = p();
     int MD, molNum;
     tables* t = tests();
+
+    printf("/////////////////////\n");
+    printf("test number 0\n");
+    printf("/////////////////////\n");
+    model(test -> arrA, test -> arrB, test -> arrSize, maxDelay(test -> arrB, test -> arrSize), test -> vars, test -> poss, test -> n, 3);
 
     for (i = 0; i < 3; i++) {
         char** vars = t[i] -> vars;
@@ -34,6 +43,7 @@ int main() {
 }
 
 int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *poss, int molNums, int systemMax) {
+    //p();
     int i, j, k;
     int len;
     int numDelays = maxDelay;
@@ -93,9 +103,13 @@ int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *pos
 
 void printRules(char ***rules, int num, char* str, int systemMax) {
     int i, j;
+    char *finals = malloc(sizeof(char) * 10000);
+    for (i = 0; i < num; i++) {
+        printf("%s_%d = %s_%d_final\n", str, i, str, i);
+    }
     for (i = 0; i < num; i++) {
         printf("%s", str);
-        printf("_%d:\n", i);
+        printf("_%d_tmp = \n", i);
         printf("%s\n", rules[i][0]);
     }
     for (i = 0; i < num; i++) {
@@ -108,6 +122,14 @@ void printRules(char ***rules, int num, char* str, int systemMax) {
             }
         }
 //        free(rules[i]);
+    }
+    for (i = 0; i < num; i++) {
+        printf("%s_%d_final =\n(", str, i);
+        for (j = 0; j < num; j++) {
+            printf("~%s_%d_tmp & ", str, j);
+        }
+        printf("%s)", str);
+        printf(" & %s_%d_tmp\n\n", str, i);
     }
 }
 

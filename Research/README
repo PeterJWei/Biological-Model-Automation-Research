@@ -1,0 +1,15 @@
+Model Design Automation Algorithms, by Peter Wei
+These algorithms are designed to take in a table of molecular strengths and create logic functions from them.
+
+To recompile the source files, type
+gcc model.c -o model
+
+And then run the executable by
+./model <filename>
+
+Currently, the filename must be a .csv file.
+For example,
+./model testfiles/Workbook1.csv
+will run the testfiles/Workbook1.csv file through the algorithms, and create a file called testfiles/Workbook1.pla
+
+testfiles/Workbook1.pla can then be run through espresso.

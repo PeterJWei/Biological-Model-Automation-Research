@@ -3,28 +3,44 @@
 #include <stdlib.h>
 #include "test_cases.h"
 #include "parsing.c"
-
+//#define tests
 /*struct stren {
     int strength;
     int delay;
 };*/
-int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *poss, int molNums, int systemMax);
+int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *poss, int molNums, int systemMax, FILE* fp);
 int maxDelay(int* arrB, int arrSize);
 void printRules(char ***rules, int num, char* str, int systemMax);
-
+void printesp(int **esp, int realsum, int realsumwoffset, int arrSize, FILE* fp);
+int** truthTables(int sum, int arrSize, int limit, int *poss, int *arrA, int *arrB, int maxDelay, int realsum);
+int sumPoss(int *poss, int molNums);
+void printPreRules(char ***rules, int num, int maxDelay, int arrSize, int *arrB, int *arrA, char **vars, int limit, int *poss);
+void printheader(char **vars, int limit, int *poss, int arrSize, int delay, int rs, FILE* fp);
 int n = 5;
 
-int main() {
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("usage: %s filename", argv[0]);
+    }
     int i;
-    struct table* test = p();
+    struct table* test = p(argv[1]);
     int MD, molNum;
+
+////////////////////////////////////
+//Open new file to write to
+    char* fname = malloc(sizeof(char) * 1024);
+    strcpy(fname, strtok(argv[1], "."));
+    strcat(fname, ".pla");
+    printf("%s", fname);
+    FILE* fp = fopen(fname, "w");
+////////////////////////////////////
+#ifdef tests
     tables* t = tests();
+#endif
 
-    printf("/////////////////////\n");
-    printf("test number 0\n");
-    printf("/////////////////////\n");
-    model(test -> arrA, test -> arrB, test -> arrSize, maxDelay(test -> arrB, test -> arrSize), test -> vars, test -> poss, test -> n, 3);
+    model(test -> arrA, test -> arrB, test -> arrSize, maxDelay(test -> arrB, test -> arrSize), test -> vars, test -> poss, test -> n, 3, fp);
 
+#ifdef tests
     for (i = 0; i < 3; i++) {
         char** vars = t[i] -> vars;
         int* poss = t[i] -> poss;
@@ -34,24 +50,20 @@ int main() {
         int arrSize = t[i] -> arrSize;
         MD = maxDelay(arrB, arrSize);
         molNum = n;
-        printf("////////////////////////////////////////////////////\n");
-        printf("test number %d, molecule %s, %d inputs\n", i, vars[n - 1], n - 1);
-        printf("////////////////////////////////////////////////////\n");
+        fprintf(fp,"\n\n////////////////////////////////////////////////////\n");
+        fprintf(fp,"test number %d, molecule %s, %d inputs\n", i, vars[n - 1], n - 1);
+        fprintf(fp,"////////////////////////////////////////////////////\n");
         model(arrA, arrB, arrSize, MD, vars, poss, molNum, 3);
     }
+#endif
     //molecule strength array, delay array, maximum delay given, molecule variable names, possible strengths, number of vars
 }
 
-int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *poss, int molNums, int systemMax) {
+int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *poss, int molNums, int systemMax, FILE* fp) {
     //p();
     int i, j, k;
-    int len;
     int numDelays = maxDelay;
     int limit = molNums - 1;
-    int mod;
-    char* str;
-    char format[200];
-    int track;
 //    int delay = maxDelay(arrB, arrSize);
     int num = poss[limit];
     //set delay trackers
@@ -66,10 +78,59 @@ int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *pos
             strcpy(rules[i][j], "");
         }
     }
+#ifdef debug
+    printPreRules(rules, num, maxDelay, arrSize, arrB, arrA, vars, limit, poss);
+    printRules(rules, num, vars[limit], systemMax);
+#endif
+    int sum = sumPoss(poss, molNums);
+    int realsum = (sum - poss[limit]) * (maxDelay + 1) + poss[limit];
+    int realsumwoffset = realsum - poss[limit];
+#ifdef debug
+    fprintf(fp,"sum: %d, offset: %d, maxDelay: %d, realsum: %d\n", sum, poss[limit], maxDelay, realsum);
+#endif
+    int** esp = truthTables(sum, arrSize, limit, poss, arrA, arrB, maxDelay, realsum);
+    printheader(vars, limit, poss, arrSize, maxDelay, realsumwoffset, fp);
+    printesp(esp, realsum, realsumwoffset, arrSize, fp);
+    fprintf(fp,"\n.e\n");
+    free(rules);
+}
 
+void printheader(char **vars, int limit, int *poss, int arrSize, int delay, int rs, FILE* fp) {
+    fprintf(fp,".lib");
+    int i, j, k, stren;
+    char* str;
+    for (i = limit - 1; i >= 0; i--) {
+        stren = poss[i];
+        str = vars[i];
+        for (j = 0; j < stren; j++) {
+            for (k = 0; k < delay + 1; k++) {
+                if (k == 0) {
+                    fprintf(fp," %s_%d", str, j);
+                }
+                else {
+                    fprintf(fp," %s_%d_%d", str, j, k);
+                }
+            }
+        }
+    }
+    fprintf(fp,"\n.i %d\n", rs);
+    fprintf(fp,".o %d\n", poss[limit]);
+    fprintf(fp,".ob ");
+    for (i = 0; i < poss[limit]; i++) {
+        fprintf(fp," %s_%d", vars[limit], i);
+    }
+    fprintf(fp,"\n.p %d", arrSize);
+}
+
+void printPreRules(char ***rules, int num, int maxDelay, int arrSize, int *arrB, int *arrA, char **vars, int limit, int *poss) {
+    int i, j, k;
+    int track, del;
+    int mod, len;
+    char* str;
+    char format[200];
     for (j = 0; j < arrSize; j++) {
         track = j;
-        int del = arrB[j];
+        del = arrB[j];
         strcat(rules[arrA[j]][0], "(");
         for (i = limit - 1; i >= 1; i--) {
             for (k = 0; k < del + 1; k++) {
@@ -97,8 +158,61 @@ int model(int *arrA, int *arrB, int arrSize, int maxDelay, char **vars, int *pos
         len = strlen(rules[k][0]);
         strcpy((rules[k][0] + len - 4), "\0");
     }
-    printRules(rules, num, vars[limit], systemMax);
-    free(rules);
+}
+
+void printesp(int **esp, int realsum, int realsumwoffset, int arrSize, FILE* fp) {
+    int i, j;
+    for (i = 0; i < arrSize; i++) {
+        for (j = 0; j < realsum; j++) {
+            if (j == realsumwoffset) {
+                fprintf(fp,"    ");
+            }
+            else if (j == 0) {
+                fprintf(fp,"\n");
+            }
+            fprintf(fp,"%d", esp[i][j]);
+        }
+    }
+}
+
+int** truthTables(int sum, int arrSize, int limit, int *poss, int *arrA, int *arrB, int maxDelay, int realsum) {
+    int **A = calloc(sizeof(int *), arrSize);
+    int i, j, k, mod;
+    int offset, track, index, strength;
+    //int realsum = (sum - poss[limit]) * (maxDelay + 1) + poss[limit];
+    for (i = 0; i < arrSize; i++) {
+        A[i] = calloc(sizeof(int), realsum);
+    }
+    for (j = 0; j < arrSize; j++) {
+        offset = 0;
+        track = j;
+        int del = arrB[j];
+        //fprintf(fp,"index for j = %d\n", j);
+        for (i = limit - 1; i >= 0; i--) {
+            for (k = 0; k < del + 1; k++) {
+                mod = track % poss[i];
+                //fprintf(fp,"mod = %d, poss[i] = %d\n", mod, poss[i]);
+                index = offset + mod*(maxDelay + 1) + k;
+                //fprintf(fp,"%d\n", index);
+                A[j][index] = 1;
+                track = track/poss[i];
+            }
+            offset += poss[i] * (maxDelay + 1);
+        }
+        strength = arrA[j];
+        A[j][offset + strength] = 1;
+    }
+    return A;
+}
+
+
+int sumPoss(int *poss, int molNums) {
+    int i;
+    int sum = 0;
+    for (i = 0; i < molNums; i++) {
+        sum += poss[i];
+    }
+    return sum;
 }
 
 void printRules(char ***rules, int num, char* str, int systemMax) {

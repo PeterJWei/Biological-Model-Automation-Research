@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define debug
+//#define debug
 
 struct arraylen {
     char **A;
@@ -135,15 +135,19 @@ void makeArrays(int *A, int *B, FILE* stream) {
 }
         
 
-struct table* p()
+struct table* p(char *filename)
 {
     struct table* A = malloc(sizeof(struct table) * 1);   
-    FILE* stream = fopen("Workbook1.csv", "r");
+    FILE* stream = fopen(filename, "r");
     if (stream == NULL) {
         printf("NULL!\n");
         return 0;
     }
-
+    char* fname = malloc(sizeof(char) * 1024);
+    strcpy(fname, strtok(filename, "."));
+    strcat(fname, ".pla");
+    printf("%s", fname);
+    FILE* fp = fopen(fname, "w");
 /////////////////////////////////////////////////////
 //Section 1: Create variable array
     char *varname = malloc(sizeof(char) * 400);
@@ -202,5 +206,6 @@ struct table* p()
         printf("strength %d, delay %d\n", arrA[i], arrB[i]);
     }
 #endif
+    fclose(stream);
     return A;
 }

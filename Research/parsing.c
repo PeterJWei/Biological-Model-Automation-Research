@@ -123,6 +123,27 @@ void makeArrays(int *A, int *B, FILE* stream) {
                     B[count] = 3;
 //                    printf("Got 3 delay!\n");
                 }
+                else if (!strcmp("dddd", delay)) {
+                    B[count] = 4;
+                }
+                else if (!strcmp("ddddd", delay)) {
+                    B[count] = 5;
+                }
+                else if (!strcmp("dddddd", delay)) {
+                    B[count] = 6;
+                }
+                else if (!strcmp("ddddddd", delay)) {
+                    B[count] = 7;
+                }
+                else if (!strcmp("dddddddd", delay)) {
+                    B[count] = 8;
+                }
+                else if (!strcmp("ddddddddd", delay)) {
+                    B[count] = 9;
+                }
+                else if (!strcmp("dddddddddd", delay)) {
+                    B[count] = 10;
+                }
                 else {
                     B[count] = 0;
                 }
@@ -143,11 +164,6 @@ struct table* p(char *filename)
         printf("NULL!\n");
         return 0;
     }
-    char* fname = malloc(sizeof(char) * 1024);
-    strcpy(fname, strtok(filename, "."));
-    strcat(fname, ".pla");
-    printf("%s", fname);
-    FILE* fp = fopen(fname, "w");
 /////////////////////////////////////////////////////
 //Section 1: Create variable array
     char *varname = malloc(sizeof(char) * 400);
